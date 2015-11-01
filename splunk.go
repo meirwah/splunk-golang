@@ -7,7 +7,7 @@ import (
 )
 
 type SplunkConnection struct {
-        Username, Password, BaseURL string
+        Username, Password, BaseURL,SplunkUser,SplunkApp string
         sessionKey SessionKey
 }
 
