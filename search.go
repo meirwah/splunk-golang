@@ -15,6 +15,7 @@ type Row struct {
 	Preview bool `json:"preview"`
 	Offset int `json:"offset"`
 	Result map[string]Value `json:"result"`
+	LastRow bool `json:"lastrow"`
 }
 
 type Rows []Row
@@ -32,7 +33,7 @@ func parseLine(line string) (r Row,err error) {
 	return r, dec.Decode(&r)
 }
 
-func (conn SplunkConnection) Search(searchString string, params ...map[string]string) (rows []Row,err error) {
+func (conn SplunkConnection) Search(searchString string, params ...map[string]string) (rows []Row,events []string,err error) {
 	data := make(url.Values)
 	data.Add("search",searchString)
 	data.Add("output_mode","json")
@@ -47,11 +48,12 @@ func (conn SplunkConnection) Search(searchString string, params ...map[string]st
 	response, err := conn.httpPost(fmt.Sprintf("%s/servicesNS/%s/%s/search/jobs/export",conn.BaseURL,conn.SplunkUser,conn.SplunkApp),&data)
 
 	if err != nil {
-		return nil,err
+		return
 	}
 
 	lines := strings.Split(response,"\n")
 	rows = make(Rows,len(lines))
+	events = make([]string,len(lines))
 	var ni int
 	ni = 0
 
@@ -59,14 +61,18 @@ func (conn SplunkConnection) Search(searchString string, params ...map[string]st
 		if len(v) == 0 {
 			continue
 		}
+
 		if r,err := parseLine(v); err != nil {
 			fmt.Printf("Could not decode line: '%s' %s\n",v,err)
 		} else {
-			rows[ni] = r
-			ni++
+			if !r.LastRow {
+				rows[ni] = r
+				events[ni] = string(v[:])
+				ni++
+			}
 		}
 	}
-	return rows[:ni], nil;
+	return rows[:ni],events[:ni], nil;
 }
 
 func (conn SplunkConnection) SearchStream(searchString string, params ...map[string]string) (events chan *Row,err error) {
