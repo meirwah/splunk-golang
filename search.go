@@ -35,14 +35,15 @@ func parseLine(line string) (r Row,err error) {
 
 func (conn SplunkConnection) Search(searchString string, params ...map[string]string) (rows []Row,events []string,err error) {
 	data := make(url.Values)
-	data.Add("search",searchString)
-	data.Add("output_mode","json")
 
 	for _,m := range params {
 		for k,v := range m {
 			data.Add(k,v)
 		}
 	}
+
+	data.Add("search",searchString)
+	data.Add("output_mode","json")
 
 	/* TODO: return stream in order to read responses that do not fit in memory. */
 	response, err := conn.httpPost(fmt.Sprintf("%s/servicesNS/%s/%s/search/jobs/export",conn.BaseURL,conn.SplunkUser,conn.SplunkApp),&data)
