@@ -1,7 +1,6 @@
 package splunk
 
 import (
-        "fmt"
         "bytes"
         "net/http"
         "net/url"
@@ -61,11 +60,7 @@ func (conn SplunkConnection) httpCall(url string, method string, data *url.Value
 }
 
 func (conn SplunkConnection) addAuthHeader(request *http.Request) {
-        if conn.sessionKey.Value != "" {
-                request.Header.Add("Authorization", fmt.Sprintf("Splunk %s", conn.sessionKey))
-        } else {
-                request.SetBasicAuth(conn.Username, conn.Password)
-        }
+        request.SetBasicAuth(conn.Username, conn.Password)
 }
 
 
