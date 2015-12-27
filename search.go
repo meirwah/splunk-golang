@@ -65,11 +65,9 @@ func (conn SplunkConnection) Search(searchString string, params ...map[string]st
 		if r,err := parseLine(v); err != nil {
 			fmt.Printf("Could not decode line: '%s' %s\n",v,err)
 		} else {
-			if !r.LastRow {
 				rows[ni] = r
 				events[ni] = string(v[:])
 				ni++
-			}
 		}
 	}
 	return rows[:ni],events[:ni], nil;
