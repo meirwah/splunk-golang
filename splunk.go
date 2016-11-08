@@ -4,6 +4,7 @@ import (
         "fmt"
         "net/url"
         "encoding/json"
+	"net/http"
 )
 
 type SplunkConnection struct {
