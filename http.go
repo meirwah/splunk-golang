@@ -13,14 +13,6 @@ import (
  * HTTP helper methods
  */
 
-func httpClient() *http.Client {
-        tr := &http.Transport{
-                TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-        }
-        client := &http.Client{Transport: tr}
-        return client
-}
-
 func (conn SplunkConnection) httpGet(url string, data *url.Values) (string, error) {
 	if response, err := conn.httpCall(url,"GET",data);err != nil {
 		return "", err
@@ -42,8 +34,6 @@ func (conn SplunkConnection) httpPost(url string, data *url.Values) (string, err
 }
 
 func (conn SplunkConnection) httpCall(url string, method string, data *url.Values) (*http.Response, error) {
-        client := httpClient()
-
         var payload io.Reader
         if data != nil {
           payload = bytes.NewBufferString(data.Encode())
@@ -51,7 +41,7 @@ func (conn SplunkConnection) httpCall(url string, method string, data *url.Value
 
         request, err := http.NewRequest(method, url, payload)
         conn.addAuthHeader(request)
-        response, err := client.Do(request)
+        response, err := conn.HttpClient.Do(request)
 
         if err != nil {
                 return nil, err
