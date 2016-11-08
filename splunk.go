@@ -7,8 +7,9 @@ import (
 )
 
 type SplunkConnection struct {
-        Username, Password, BaseURL,SplunkUser,SplunkApp string
-        sessionKey SessionKey
+        Username, Password, BaseURL, SplunkUser, SplunkApp string
+	sessionKey                                         SessionKey
+	HttpClient                                         *http.Client
 }
 
 // SessionKey represents the JSON object returned from the Splunk authentication REST call
