@@ -34,6 +34,7 @@ func (conn SplunkConnection) Login() (key SessionKey, err error){
         bytes := []byte(response)
         err = json.Unmarshal(bytes, &key)
 	if err != nil {
+		err = fmt.Errorf(response)
 		return
 	}
 
